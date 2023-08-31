@@ -16,7 +16,7 @@ from .utils import *
 
 
 class Forest2D():
-    def __init__(self, L, g0, r_range, coeffs, nu=2, tol=.1, rng=None):
+    def __init__(self, Lx,Ly, g0, r_range, coeffs, nu=2, tol=.1, rng=None):
         """
         Parameters
         ----------
@@ -43,7 +43,10 @@ class Forest2D():
         assert r_range.min()>0
         assert 0<tol<1
         
-        self.L = L
+        self.Lx = Lx
+        self.Ly = Ly
+        self.xlim = (0, self.Lx)
+        self.ylim = (0, self.Ly)
         self.g0 = g0
         self.tol = tol
         self.t = 0  # time counter of total age of forest
@@ -171,9 +174,16 @@ class Forest2D():
 
         # introduce saplings
         for i in range(self.rng.poisson(self.g0 * dt)):
-            self.trees.append( Tree(self.rng.uniform(0, self.L, size=2), self.t) )
+            s = self.new_sapling()
+            if s is not None:
+                self.trees.append(s  )
 
         self.t += dt
+        print(self.t)
+
+    def new_sapling(self):
+        return Tree((self.rng.uniform(0, self.Lx, size=1),self.rng.uniform(0, self.Ly, size=1),), self.t)
+
 
     def kill(self, dt=1, **kwargs):
         """Kill trees across all size classes for one time step.
@@ -357,7 +367,7 @@ class Forest2D():
 
         def loop_wrapper(args):
             # create a new forest with same parameters
-            forest = Forest2D(self.L, self.g0, self.rRange, self.coeffs, self.nu)
+            forest = Forest2D(self.Lx, self.Ly, self.g0, self.rRange, self.coeffs, self.nu)
             if return_trees:
                 return forest.sample(n_sample, dt, sample_dt, return_trees=True, **kwargs)
             return forest.sample(n_sample, dt, sample_dt, **kwargs)
@@ -450,7 +460,7 @@ class Forest2D():
             ax.plot(xy[:,0], xy[:,1], '.', **center_kw)
         
         # plot settings
-        ax.set(xlim=(0, self.L), ylim=(0, self.L), **plot_kw)
+        ax.set(xlim=self.xlim, ylim=self.ylim, **plot_kw)
         
         if not ax_given:
             return fig
