@@ -16,7 +16,7 @@ from .utils import *
 
 
 class Forest2D():
-    def __init__(self, Lx,Ly, g0, r_range, coeffs, nu=2, tol=.1, rng=None):
+    def __init__(self, Lx,Ly, g0, r_range, coeffs, nu=2, tol=.1, rng=None, trees_0=[]):
         """
         Parameters
         ----------
@@ -55,7 +55,7 @@ class Forest2D():
         self.coeffs = coeffs
         self.kmax = r_range.size - 1
         
-        self.trees = []  # list of all trees in system
+        self.trees = trees_0  # list of all trees in system
         self.deadTrees = []  # list of all dead trees
 
         # env fluctuation
@@ -496,7 +496,7 @@ class LogForest2D(Forest2D):
 class Tree():
     """Tree object for keeping track of tree properties.
     """
-    def __init__(self, xy, t0=0):
+    def __init__(self, xy, t0=0, size_ix_0 = 0):
         """
         Parameters
         ----------
@@ -509,7 +509,7 @@ class Tree():
         self.xy = xy
         self.t0 = t0
         self.t = None
-        self.size_ix = 0  # size class to which tree belongs
+        self.size_ix = size_ix_0  # size class to which tree belongs
 
     def grow(self):
         self.size_ix += 1
